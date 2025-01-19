@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,7 +20,6 @@ import java.util.function.Function;
 @Service
 public class JWTService {
     private  String secretKey = "";
-
     public JWTService() {
         try {
             KeyGenerator keyGenerator = KeyGenerator.getInstance("HmacSHA256");
@@ -40,7 +41,7 @@ public class JWTService {
                 .and()
                 .signWith(getSecretKey()).compact();
     }
-    public String extractUsername(String token){
+    public String extractUserEmail(String token){
         return extractClaim(token,Claims::getSubject);
 
     }
@@ -56,17 +57,23 @@ public class JWTService {
                 .getPayload();
     }
     public boolean validateToken(String token, UserDetails userDetails){
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())&&!isTokenExpired(token));
+        final String userEmail = extractUserEmail(token);
+        return (userEmail.equals(userDetails.getUsername())&&!isTokenExpired(token));
     }
     public boolean isTokenExpired(String token){
-        return expirationDate(token).before(new Date());
+        LocalDateTime expirationTime = expirationDate(token);
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        return expirationTime.isBefore(now);
     }
-    private Date expirationDate(String token){
-        return extractClaim(token,Claims::getExpiration);
+    protected LocalDateTime expirationDate(String token){
+        Date _expirationDate = extractClaim(token,Claims::getExpiration);
+        return coverToLocalDateTime(_expirationDate);
     }
     public SecretKey getSecretKey() {
         byte[] encodedKey = Base64.getDecoder().decode(secretKey);
         return Keys.hmacShaKeyFor(encodedKey);
+    }
+    public LocalDateTime coverToLocalDateTime(Date date){
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 }
