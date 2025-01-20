@@ -20,9 +20,11 @@ public class Notes {
     @Column(name = "tag")
     private List<String> tags;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+//    @ManyToOne
+//    @JoinColumn(name = "user_id", nullable = false)
+//    private Users user;
+    @Column(name = "user_id",nullable = false)
+    private UUID userId;
     @Transient
     private String author;
 
@@ -66,19 +68,16 @@ public class Notes {
         this.tags = tags;
     }
 
-    public Users getUser() {
-        return user;
+    public UUID getUserId() {
+        return userId;
     }
 
-    public void setUser(Users user) {
-        this.user = user;
+    public void setUserId(UUID userId) {
+        this.userId = userId;
     }
 
     public String getAuthor() {
-       if(user != null){
-           return user.getFirstName()+", "+user.getLastName();
-       }
-       return null;
+        return author;
     }
 
     public void setAuthor(String author) {
@@ -93,7 +92,7 @@ public class Notes {
                 ", content='" + content + '\'' +
                 ", lastModified=" + lastModified +
                 ", tags=" + tags +
-                ", user=" + user +
+                ", userId=" + userId +
                 ", author='" + author + '\'' +
                 '}';
     }

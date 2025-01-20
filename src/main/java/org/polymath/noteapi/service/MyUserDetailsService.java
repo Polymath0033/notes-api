@@ -19,7 +19,6 @@ public class MyUserDetailsService implements UserDetailsService {
         Users users = userRepo.findUserByEmail(userEmail);
         if(users == null) {
             throw new UsernameNotFoundException(userEmail);
-//                    ||throw new UsernameNotFoundException("user not found");
         }
         return new  UserPrincipal(users);
     }

@@ -35,10 +35,10 @@ public class UserService {
             throw new UserAlreadyExistsException("Username already exist");
         }
         user.setPassword(encoder.encode(user.getPassword()));
-//        String authToken = jwtService.generateToken(user.getEmail());
-//        LocalDateTime expirationTime = jwtService.expirationDate(authToken);
-//        user.setAuthToken(authToken);
-//        user.setExpiresAt(expirationTime);
+        String authToken = jwtService.generateToken(user.getEmail());
+        LocalDateTime expirationTime = jwtService.expirationDate(authToken);
+        user.setAuthToken(authToken);
+        user.setExpiresAt(expirationTime);
         userRepo.save(user);
     }
 
