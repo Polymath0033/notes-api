@@ -39,6 +39,7 @@ public class UserService {
         LocalDateTime expirationTime = jwtService.expirationDate(authToken);
         user.setAuthToken(authToken);
         user.setExpiresAt(expirationTime);
+        System.out.println(user);
         userRepo.save(user);
     }
 
