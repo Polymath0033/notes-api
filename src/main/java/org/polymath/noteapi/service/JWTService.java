@@ -41,7 +41,7 @@ public class JWTService {
                 .and()
                 .signWith(getSecretKey()).compact();
     }
-    public String extractUserEmail(String token){
+    public String extractUserId(String token){
         return extractClaim(token,Claims::getSubject);
 
     }
@@ -57,8 +57,8 @@ public class JWTService {
                 .getPayload();
     }
     public boolean validateToken(String token, UserDetails userDetails){
-        final String userEmail = extractUserEmail(token);
-        return (userEmail.equals(userDetails.getUsername())&&!isTokenExpired(token));
+        final String userId = extractUserId(token);
+        return (userId.equals(userDetails.getUsername())&&!isTokenExpired(token));
     }
     public boolean isTokenExpired(String token){
         LocalDateTime expirationTime = expirationDate(token);

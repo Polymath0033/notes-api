@@ -9,16 +9,18 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class MyUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UserRepo userRepo;
     @Override
-    public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
-        Users users = userRepo.findUserByEmail(userEmail);
+    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+        Users users = userRepo.findUserById(UUID.fromString(userId));
         if(users == null) {
-            throw new UsernameNotFoundException(userEmail);
+            throw new UsernameNotFoundException(userId);
         }
         return new  UserPrincipal(users);
     }

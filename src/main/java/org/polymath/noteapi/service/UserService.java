@@ -34,25 +34,35 @@ public class UserService {
         if(userRepo.existsByUsername(user.getUsername())){
             throw new UserAlreadyExistsException("Username already exist");
         }
+        userRepo.save(user);
         user.setPassword(encoder.encode(user.getPassword()));
-        String authToken = jwtService.generateToken(user.getEmail());
+        String authToken = jwtService.generateToken(user.getId().toString());
         LocalDateTime expirationTime = jwtService.expirationDate(authToken);
         user.setAuthToken(authToken);
         user.setExpiresAt(expirationTime);
-        System.out.println(user);
         userRepo.save(user);
     }
 
     public String login(Users user) {
-      //  CustomAuthenticationToken token = new CustomAuthenticationToken(user.getUsername(),user.getPassword(),user.getEmail());
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(),user.getPassword()));
-        if(authentication.isAuthenticated()) {
-            String token = jwtService.generateToken(user.getEmail());
-            user.setAuthToken(token);
-            user.setExpiresAt(jwtService.expirationDate(token));
-            return jwtService.generateToken(user.getEmail());
-        }else {
+        Users existingUser = userRepo.findUserByEmail(user.getEmail());
+        //  CustomAuthenticationToken token = new CustomAuthenticationToken(user.getUsername(),user.getPassword(),user.getEmail());
+
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(existingUser.getId(), user.getPassword()));
+            System.out.println("Authentication successful: " + authentication.isAuthenticated());
+            if (authentication.isAuthenticated()) {
+                String token = jwtService.generateToken(existingUser.getId().toString());
+                user.setAuthToken(token);
+                user.setExpiresAt(jwtService.expirationDate(token));
+                return token;
+            } else {
+                return "Invalid email or password";
+            }
+        } catch (Exception e) {
+//            e.printStackTrace();
+            System.out.println("Authentication failed: " + e.getMessage());
             return "Invalid email or password";
+//            throw new RuntimeException(e);
         }
     }
     public List<Users> getAllUsers(){

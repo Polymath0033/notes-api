@@ -24,7 +24,11 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public String getUsername() {
-        return users.getEmail();
+        if(users.getId() != null) {
+            return users.getId().toString();
+        }else{
+            throw new IllegalArgumentException("UserId cannot be null");
+        }
     }
 
     @Override

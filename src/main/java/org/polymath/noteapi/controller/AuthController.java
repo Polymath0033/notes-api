@@ -53,7 +53,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public String loginUser(@RequestBody Users user) {
-        System.out.println(user);
+
         return userService.login(user);
     }
     @GetMapping("/user")
