@@ -81,7 +81,10 @@ public class NotesController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchAllByTitleOrContentOrTag(@RequestParam(required = false) String title, @RequestParam(required = false) String content, @RequestParam(required = false) List<String> tags,@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<?> searchAllByTitleOrContentOrTag(@RequestParam(required = false) String title,
+                                                            @RequestParam(required = false) String content,
+                                                            @RequestParam(required = false) List<String> tags,
+                                                            @RequestHeader("Authorization") String authHeader) {
 
        try {
            String token = authHeader.substring(7);
@@ -97,8 +100,8 @@ public class NotesController {
                tags = Collections.emptyList();
            }
 //           List<Notes> notesList = notesRepo.findAllByUserId(userId);
-           System.out.println(userId);
-           List<Notes> notes = notesRepo.findNotesByTitleOrContentOrTags(title,content,tags,userId);
+           //System.out.println(userId);
+           List<Notes> notes = notesRepo.findNotesByTitleOrContentOrTags(title,content,tags);
           if (notes.isEmpty()) {
               return ResponseEntity.ok(Collections.emptyList());
           }

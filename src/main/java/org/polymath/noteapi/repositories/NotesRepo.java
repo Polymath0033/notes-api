@@ -18,33 +18,32 @@ public interface NotesRepo extends JpaRepository<Notes, UUID> {
     Optional<Notes> findAllById(UUID id);
     List<Notes> findAllByTitleIsContainingIgnoreCase(String title);
     List<Notes> findAllByUserId(UUID userId);
-
+//
 //    @Query("select note from Notes note where "+
 //            "(lower(note.title) like lower(concat('%',:title,'%')) or :title is null) or "+
 //            "(lower(note.content) like lower(concat('%',:content,'%')) or :content is null) or "+
 //            "(:tags is null or exists (select tag from note.tags tag where tag in :tags))")
 //@Query("""
 //    select note from Notes note
-//    where note.userId = :userId
-//    and (
+//    where (
 //        (:title is null or lower(note.title) like lower(concat('%', :title, '%')))
-//        or (:content is null or lower(note.content) like lower(concat('%', :content, '%')))
-//        or (:tags is null or exists (
+//        and (:content is null or lower(note.content) like lower(concat('%', :content, '%')))
+//        and (:tags is null or exists (
 //            select tag from note.tags tag where tag in :tags
 //        ))
 //    )
 //""")
-    @Query("""
-            select note from Notes note
-            where  (
-            (:title is null or lower(note.title) like lower(concat('%', :title, '%')))
-            or (:content is null or lower(note.content) like lower(concat('%', :content, '%')))
-            or (:tags is null or exists (
-            select tag from note.tags tag where tag in :tags
-            ))
-        ) and note.userId = :userId
-    """)
 
-    List<Notes> findNotesByTitleOrContentOrTags(String title,String content,List<String> tags,UUID userId);
+    @Query("""
+    select note from Notes note
+    where (
+        (:title is null or lower(cast(note.title as string)) like lower(concat('%', :title, '%')))
+        and (:content is null or lower(cast(note.content as string)) like lower(concat('%', :content, '%')))
+        and (:tags is null or exists (
+            select tag from note.tags tag where tag in :tags
+        ))
+    )
+""")
+    List<Notes> findNotesByTitleOrContentOrTags(String title,String content,List<String> tags);
 
 }
