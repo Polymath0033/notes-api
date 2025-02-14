@@ -1,5 +1,6 @@
 package org.polymath.noteapi.service;
 
+import org.polymath.noteapi.dto.request.ChangePasswordRequest;
 import org.polymath.noteapi.dto.request.RegisterRequest;
 import org.polymath.noteapi.dto.response.AuthResponse;
 import org.polymath.noteapi.exceptions.CustomBadRequest;
@@ -64,6 +65,21 @@ public class UserService {
            throw new RuntimeException("Authentication failed");
 
         }
+    }
+
+    public void changePassword(ChangePasswordRequest request,String authHeader){
+        if((request.oldPassword()==null||request.oldPassword().isEmpty())&&(request.newPassword()==null||request.newPassword().isEmpty())){
+            throw new CustomBadRequest("Old password and new password are required");
+        }
+        String token = authHeader.substring(7);
+        String email = jwtService.extractEmail(token);
+        Users user = userRepo.findUserByEmail(email).orElseThrow(()->new UserDoesNotExist("You are not authenticated"));
+        if(!encoder.matches(request.oldPassword(),user.getPassword())){
+            throw new CustomBadRequest("Old password does not match");
+        }
+        String encodedNewPassword = encoder.encode(request.newPassword());
+        user.setPassword(encodedNewPassword);
+        userRepo.save(user);
     }
 
 
